@@ -1,0 +1,44 @@
+html,
+body {
+  overscroll-behavior: none;
+}
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: sans-serif;
+}
+fieldset,
+.form-label-group {
+  display: contents;
+}
+
+.form-label-group * {
+  text-decoration: underline;
+  text-align: left;
+}
+
+.form-label-group input {
+  width: 2rem;
+}
+.form-group {
+  padding: 1rem;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+button {
+  width: 100%;
+  background-color: blue;
+  color: white;
+}
+
+#root {
+  width: 100%;
+  max-width: 260px;
+  overflow-x: hidden;
+  margin: auto;
+}

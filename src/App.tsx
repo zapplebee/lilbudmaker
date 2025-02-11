@@ -90,10 +90,13 @@ const FaceEditor = () => {
       <svg
         width="240"
         height="240"
-        style={{ background: "#00F" }}
+        style={{ background: "#00F", touchAction: "none" }}
         viewBox="0 0 240 240"
         onMouseMove={handleMove}
-        onTouchMove={handleMove}
+        onTouchMove={(e) => {
+          e.preventDefault();
+          handleMove(e);
+        }}
         onMouseUp={handleEnd}
         onTouchEnd={handleEnd}
       >

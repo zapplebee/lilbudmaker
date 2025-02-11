@@ -26,24 +26,24 @@ const FaceEditor = () => {
   const [emo, setEmo] = useState(null);
   const [vectors, setVectors] = useState({
     points: {
-      a: { x: 10, y: 10 },
-      b: { x: size - 10, y: 10 },
-      c: { x: size - 10, y: size - 10 },
-      d: { x: 10, y: size - 10 },
-      e: { x: 15, y: 15 },
-      f: { x: 90, y: 15 },
-      g: { x: 5, y: 25 },
-      h: { x: 90, y: 25 },
-      i: { x: 140, y: 5 },
-      j: { x: 200, y: 5 },
-      k: { x: 140, y: 20 },
-      l: { x: 200, y: 20 },
-      m: { x: 15, y: 200 },
-      n: { x: 220, y: 200 },
-      o: { x: 15, y: 220 },
-      p: { x: 220, y: 220 },
-      q: { x: 80, y: 100 },
-      r: { x: 140, y: 100 },
+      a: { x: 10, y: 10 }, // head upper left
+      b: { x: size - 10, y: 10 }, // head upper right
+      c: { x: size - 10, y: size - 10 }, // head lower right
+      d: { x: 10, y: size - 10 }, // head lower left
+      e: { x: 15, y: 15 }, // left brow top left
+      f: { x: 90, y: 15 }, // left brow top right
+      g: { x: 5, y: 25 }, // left brow bottom left
+      h: { x: 90, y: 25 }, // left brow bottom right
+      i: { x: 140, y: 5 }, // right brow top left
+      j: { x: 200, y: 5 }, // right brow top right
+      k: { x: 140, y: 20 }, // right brow bottom left
+      l: { x: 200, y: 20 }, // right brow bottom right
+      m: { x: 15, y: 200 }, // mouth top left
+      n: { x: 220, y: 200 }, // mouth top right
+      o: { x: 15, y: 220 }, // mouth bottom left
+      p: { x: 220, y: 220 }, // mouth bottom right
+      q: { x: 80, y: 100 }, // left eye
+      r: { x: 140, y: 100 }, // right eye
     },
     dragTarget: null,
   });
@@ -190,7 +190,17 @@ const FaceEditor = () => {
       </svg>
       <div className="form-group">
         <fieldset onChange={(e) => setEmo((e.target as any).value)}>
-          {["happy", "sad", "angry", "sleepy", "hungry"].map((emotion) => (
+          {[
+            "happy",
+            "sad",
+            "angry",
+            "sleepy",
+            "hungry",
+            "content",
+            "silly",
+            "thinking",
+            "confused",
+          ].map((emotion) => (
             <div key={emotion} className="form-label-group">
               <label htmlFor={emotion + "radio"}>{emotion}</label>
               <input

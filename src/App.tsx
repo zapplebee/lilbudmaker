@@ -1,4 +1,22 @@
 import React, { useState } from "react";
+import { Gallery } from "./Gallery";
+
+type Points = Record<string, { x: number; y: number }>;
+
+const DEFAULT_POINTS: Points = {
+  a: { x: 10,  y: 10  }, b: { x: 230, y: 10  },
+  c: { x: 230, y: 230 }, d: { x: 10,  y: 230 },
+  e: { x: 15,  y: 15  }, f: { x: 90,  y: 15  },
+  g: { x: 5,   y: 25  }, h: { x: 90,  y: 25  },
+  i: { x: 140, y: 5   }, j: { x: 200, y: 5   },
+  k: { x: 140, y: 20  }, l: { x: 200, y: 20  },
+  m: { x: 15,  y: 200 }, n: { x: 220, y: 200 },
+  o: { x: 15,  y: 220 }, p: { x: 220, y: 220 },
+  q: { x: 80,  y: 100 }, r: { x: 140, y: 100 },
+};
+
+const HEAD_COLOR = "#00fc00";
+const size = 240;
 
 type CircProps = {
   vKey: string;
@@ -6,245 +24,151 @@ type CircProps = {
   targetHandler: (vKey: string) => any;
 };
 
-const Circ = ({ vKey, vectors, targetHandler }: CircProps) => {
-  return (
-    <circle
-      cx={vectors.points[vKey].x}
-      cy={vectors.points[vKey].y}
-      r="20"
-      onMouseDown={targetHandler(vKey)}
-      onTouchStart={targetHandler(vKey)}
-      fill="red"
-      style={{ opacity: vectors.dragTarget === vKey ? 0.5 : 0 }}
-    />
-  );
+const Circ = ({ vKey, vectors, targetHandler }: CircProps) => (
+  <circle
+    cx={vectors.points[vKey].x}
+    cy={vectors.points[vKey].y}
+    r="20"
+    onMouseDown={targetHandler(vKey)}
+    onTouchStart={targetHandler(vKey)}
+    fill="red"
+    style={{ opacity: vectors.dragTarget === vKey ? 0.5 : 0 }}
+  />
+);
+
+type FaceEditorProps = {
+  initialPoints?: Points;
+  onSaved: () => void;
 };
 
-const size = 240;
-const color = "#fba000";
-const FaceEditor = () => {
-  const [emo, setEmo] = useState(null);
+const FaceEditor = ({ initialPoints, onSaved }: FaceEditorProps) => {
+  const [emo, setEmo] = useState<string | null>(null);
   const [vectors, setVectors] = useState({
-    points: {
-      a: { x: 10, y: 10 }, // head upper left
-      b: { x: size - 10, y: 10 }, // head upper right
-      c: { x: size - 10, y: size - 10 }, // head lower right
-      d: { x: 10, y: size - 10 }, // head lower left
-      e: { x: 15, y: 15 }, // left brow top left
-      f: { x: 90, y: 15 }, // left brow top right
-      g: { x: 5, y: 25 }, // left brow bottom left
-      h: { x: 90, y: 25 }, // left brow bottom right
-      i: { x: 140, y: 5 }, // right brow top left
-      j: { x: 200, y: 5 }, // right brow top right
-      k: { x: 140, y: 20 }, // right brow bottom left
-      l: { x: 200, y: 20 }, // right brow bottom right
-      m: { x: 15, y: 200 }, // mouth top left
-      n: { x: 220, y: 200 }, // mouth top right
-      o: { x: 15, y: 220 }, // mouth bottom left
-      p: { x: 220, y: 220 }, // mouth bottom right
-      q: { x: 80, y: 100 }, // left eye
-      r: { x: 140, y: 100 }, // right eye
-    },
-    dragTarget: null,
+    points: initialPoints ?? DEFAULT_POINTS,
+    dragTarget: null as string | null,
   });
 
   function makeTargetHandler(key: string) {
-    return () => {
-      setVectors({
-        ...vectors,
-        dragTarget: key as any,
-      });
-    };
+    return () => setVectors({ ...vectors, dragTarget: key });
   }
 
   function handleMove(e: React.MouseEvent | React.TouchEvent) {
-    if (vectors.dragTarget) {
-      const rect = e.currentTarget.getBoundingClientRect();
-      let x, y;
-      if ("touches" in e) {
-        x = e.touches[0].clientX - rect.left;
-        y = e.touches[0].clientY - rect.top;
-      } else {
-        x = e.clientX - rect.left;
-        y = e.clientY - rect.top;
-      }
-      setVectors((prevVectors) => ({
-        ...prevVectors,
-        points: {
-          ...prevVectors.points,
-          [prevVectors.dragTarget as any]: { x, y },
-        },
-      }));
+    if (!vectors.dragTarget) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    let x: number, y: number;
+    if ("touches" in e) {
+      x = e.touches[0].clientX - rect.left;
+      y = e.touches[0].clientY - rect.top;
+    } else {
+      x = e.clientX - rect.left;
+      y = e.clientY - rect.top;
     }
+    setVectors((prev) => ({
+      ...prev,
+      points: { ...prev.points, [prev.dragTarget!]: { x, y } },
+    }));
   }
 
   function handleEnd() {
-    setVectors((prevVectors) => ({
-      ...prevVectors,
-      dragTarget: null,
-    }));
+    setVectors((prev) => ({ ...prev, dragTarget: null }));
   }
 
   return (
     <>
       <svg
-        width="240"
-        height="240"
-        style={{ background: "#00F", touchAction: "none" }}
-        viewBox="0 0 240 240"
+        width={size} height={size}
+        style={{ background: "#0000f8", touchAction: "none" }}
+        viewBox={`0 0 ${size} ${size}`}
         onMouseMove={handleMove}
-        onTouchMove={(e) => {
-          e.preventDefault();
-          handleMove(e);
-        }}
+        onTouchMove={(e) => { e.preventDefault(); handleMove(e); }}
         onMouseUp={handleEnd}
         onTouchEnd={handleEnd}
       >
         <polygon
-          points={`${vectors.points.a.x},${vectors.points.a.y} ${vectors.points.b.x},${vectors.points.b.y} ${vectors.points.c.x},${vectors.points.c.y} ${vectors.points.d.x},${vectors.points.d.y}`}
-          fill={color}
-          stroke="black"
+          points={["a","b","c","d"].map((k) => `${vectors.points[k].x},${vectors.points[k].y}`).join(" ")}
+          fill={HEAD_COLOR} stroke="black"
         />
-
-        <line
-          x1={vectors.points.e.x}
-          y1={vectors.points.e.y}
-          x2={vectors.points.f.x}
-          y2={vectors.points.f.y}
-          stroke="black"
-          strokeWidth={2}
-        />
-        <line
-          x1={vectors.points.g.x}
-          y1={vectors.points.g.y}
-          x2={vectors.points.h.x}
-          y2={vectors.points.h.y}
-          stroke="black"
-          strokeWidth={2}
-        />
-        <line
-          x1={vectors.points.i.x}
-          y1={vectors.points.i.y}
-          x2={vectors.points.j.x}
-          y2={vectors.points.j.y}
-          stroke="black"
-          strokeWidth={2}
-        />
-        <line
-          x1={vectors.points.k.x}
-          y1={vectors.points.k.y}
-          x2={vectors.points.l.x}
-          y2={vectors.points.l.y}
-          stroke="black"
-          strokeWidth={2}
-        />
-        <line
-          x1={vectors.points.m.x}
-          y1={vectors.points.m.y}
-          x2={vectors.points.n.x}
-          y2={vectors.points.n.y}
-          stroke="black"
-          strokeWidth={2}
-        />
-        <line
-          x1={vectors.points.o.x}
-          y1={vectors.points.o.y}
-          x2={vectors.points.p.x}
-          y2={vectors.points.p.y}
-          stroke="black"
-          strokeWidth={2}
-        />
-
-        <circle
-          cx={vectors.points.q.x}
-          cy={vectors.points.q.y}
-          r="10"
-          fill="black"
-        />
-        <circle
-          cx={vectors.points.r.x}
-          cy={vectors.points.r.y}
-          r="10"
-          fill="black"
-        />
-        <>
-          <Circ vKey="a" vectors={vectors} targetHandler={makeTargetHandler} />
-          <Circ vKey="b" vectors={vectors} targetHandler={makeTargetHandler} />
-          <Circ vKey="c" vectors={vectors} targetHandler={makeTargetHandler} />
-          <Circ vKey="d" vectors={vectors} targetHandler={makeTargetHandler} />
-          <Circ vKey="e" vectors={vectors} targetHandler={makeTargetHandler} />
-          <Circ vKey="f" vectors={vectors} targetHandler={makeTargetHandler} />
-          <Circ vKey="g" vectors={vectors} targetHandler={makeTargetHandler} />
-          <Circ vKey="h" vectors={vectors} targetHandler={makeTargetHandler} />
-          <Circ vKey="i" vectors={vectors} targetHandler={makeTargetHandler} />
-          <Circ vKey="j" vectors={vectors} targetHandler={makeTargetHandler} />
-          <Circ vKey="k" vectors={vectors} targetHandler={makeTargetHandler} />
-          <Circ vKey="l" vectors={vectors} targetHandler={makeTargetHandler} />
-          <Circ vKey="m" vectors={vectors} targetHandler={makeTargetHandler} />
-          <Circ vKey="n" vectors={vectors} targetHandler={makeTargetHandler} />
-          <Circ vKey="o" vectors={vectors} targetHandler={makeTargetHandler} />
-          <Circ vKey="p" vectors={vectors} targetHandler={makeTargetHandler} />
-          <Circ vKey="q" vectors={vectors} targetHandler={makeTargetHandler} />
-          <Circ vKey="r" vectors={vectors} targetHandler={makeTargetHandler} />
-        </>
+        {(["e","g","i","k","m","o"] as const).map((start, idx) => {
+          const end = ["f","h","j","l","n","p"][idx];
+          return (
+            <line key={start}
+              x1={vectors.points[start].x} y1={vectors.points[start].y}
+              x2={vectors.points[end].x}   y2={vectors.points[end].y}
+              stroke="black" strokeWidth={2}
+            />
+          );
+        })}
+        {["q","r"].map((k) => (
+          <circle key={k} cx={vectors.points[k].x} cy={vectors.points[k].y} r="10" fill="black" />
+        ))}
+        {Object.keys(vectors.points).map((k) => (
+          <Circ key={k} vKey={k} vectors={vectors} targetHandler={makeTargetHandler} />
+        ))}
       </svg>
+
       <div className="form-group">
-        <fieldset onChange={(e) => setEmo((e.target as any).value)}>
-          {[
-            "happy",
-            "sad",
-            "angry",
-            "sleepy",
-            "hungry",
-            "content",
-            "silly",
-            "thinking",
-            "confused",
-          ].map((emotion) => (
+        <fieldset onChange={(e) => setEmo((e.target as unknown as HTMLInputElement).value)}>
+          {["happy","sad","angry","sleepy","hungry","content","silly","thinking","confused"].map((emotion) => (
             <div key={emotion} className="form-label-group">
               <label htmlFor={emotion + "radio"}>{emotion}</label>
-              <input
-                name="emotion"
-                type="radio"
-                id={emotion + "radio"}
-                value={emotion}
-              />
+              <input name="emotion" type="radio" id={emotion + "radio"} value={emotion} />
             </div>
           ))}
         </fieldset>
       </div>
-      <button
-        onClick={(e) => {
-          e.preventDefault();
-          console.log({ emo, vectors });
-          fetch("/api/face", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ emo, points: vectors.points }),
-          })
-            .then((res) => {
-              console.log(res);
-              alert("Face saved!");
-              window.location = "/" as any;
-            })
-            .catch(() => {
-              alert("Error saving face");
-            });
-        }}
-      >
-        Submit
-      </button>
-      <button
-        onClick={() => {
-          window.location = "/" as any;
-        }}
-      >
-        RESET
+
+      <button onClick={(e) => {
+        e.preventDefault();
+        fetch("/lilbudmaker/api/face", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ emo, points: vectors.points }),
+        }).then(() => { alert("Face saved!"); onSaved(); }).catch(() => alert("Error saving face"));
+      }}>Submit</button>
+
+      <button onClick={() => setVectors({ points: DEFAULT_POINTS, dragTarget: null })}>
+        Reset
       </button>
     </>
   );
 };
 
-export default FaceEditor;
+type View = "gallery" | "editor";
+
+export default function App() {
+  const [view, setView] = useState<View>("gallery");
+  const [clonePoints, setClonePoints] = useState<Points | undefined>(undefined);
+
+  function startNew() {
+    setClonePoints(undefined);
+    setView("editor");
+  }
+
+  function startClone(face: { points: Points }) {
+    setClonePoints({ ...face.points });
+    setView("editor");
+  }
+
+  return (
+    <>
+      <div style={{
+        display: "flex", gap: "0.5rem", padding: "0.5rem",
+        backgroundColor: "#00007a", borderBottom: "2px solid #840084",
+      }}>
+        <button onClick={() => setView("gallery")}
+          style={{ flex: 1, opacity: view === "gallery" ? 1 : 0.5 }}>
+          gallery
+        </button>
+        <button onClick={startNew}
+          style={{ flex: 1, opacity: view === "editor" ? 1 : 0.5 }}>
+          + new
+        </button>
+      </div>
+
+      {view === "gallery"
+        ? <Gallery onEdit={startClone} />
+        : <FaceEditor initialPoints={clonePoints} onSaved={() => setView("gallery")} />
+      }
+    </>
+  );
+}

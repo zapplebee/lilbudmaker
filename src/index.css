@@ -1,14 +1,18 @@
 html,
 body {
   overscroll-behavior: none;
+  background-color: #00007a;
+  color: #00fc00;
+  font-family: monospace;
 }
 
 * {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-  font-family: sans-serif;
+  font-family: monospace;
 }
+
 fieldset,
 .form-label-group {
   display: contents;
@@ -17,23 +21,40 @@ fieldset,
 .form-label-group * {
   text-decoration: underline;
   text-align: left;
+  color: #00fc00;
 }
 
 .form-label-group input {
   width: 2rem;
+  accent-color: #840084;
 }
+
 .form-group {
   padding: 1rem;
   display: grid;
   grid-template-columns: 1fr 2fr;
   gap: 0.5rem;
   width: 100%;
+  background-color: #0000f8;
+  border: 2px solid #840084;
 }
 
 button {
   width: 100%;
-  background-color: blue;
-  color: white;
+  background-color: #840084;
+  color: #00fc00;
+  border: 2px solid #00fc00;
+  font-family: monospace;
+  font-size: 1rem;
+  padding: 0.4rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+button:hover {
+  background-color: #00fc00;
+  color: #000000;
 }
 
 #root {
@@ -41,4 +62,5 @@ button {
   max-width: 260px;
   overflow-x: hidden;
   margin: auto;
+  padding-top: 1rem;
 }
